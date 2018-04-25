@@ -1,6 +1,7 @@
-local kubePrometheus = import "kube-prometheus.libsonnet";
+local kubePrometheus = (import "kube-prometheus/kube-prometheus.libsonnet") + {
+    _config+:: {
+        namespace: "monitoring",
+    }
+};
 
-local namespace = "monitoring";
-local objects = kubePrometheus.new(namespace);
-
-{[path]: std.manifestYamlDoc(objects[path]) for path in std.objectFields(objects)}
+{[path+".yaml"]: std.manifestYamlDoc(kubePrometheus.kubernetes_objects[path]) for path in std.objectFields(kubePrometheus.kubernetes_objects)}
